@@ -9,7 +9,7 @@ But don't worry, classes still have their place in Swift. Unlike value types, cl
 
 Today we will discuss classes in detail. We will start with basic class definitions, then we'll look into subclassing and initialization. 
 
-##Classes in Swift: Basics
+##Basics
 
 Class definitions are way simpler than they used to be in Objective-C. We no longer have separate header and implementation files. Let's start by defining a simple `User` class in playground:
 
@@ -58,7 +58,7 @@ Swift only provides the default initializer when we don't implement a custom one
     
 We have defined and initialized a basic class. Next, let's take a look at how classes deal with mutablity.
     
-##Classes in Swift: Mutablity
+##Mutablity
 
 As mentioned throughout the first two parts of this tutorial series, one of the important differences between value types and reference types is how they work in combination with `let` and `var`. 
 
@@ -81,10 +81,61 @@ You will see this compiler error: *Cannot assign to 'let' value 'user1'*:
 
 It's important to keep the different semantics for `let` in mind when dealing with classes and structs in Swift.
 
-##Classes in Swift: Inheritance
+##Inheritance
+Class inheritance in Swift works mostly as in Objective-C and other popular languages. There are two interesting aspects which I want to discuss in more detail: initializor inheritance and overriding.
 
+Let's add a method to our `User` class so that we can demonstrate method overriding:
 
-Unlike subclasses in Objective-C, Swift subclasses do not inherit their superclass initializers by default. 
+    class User {
+      var name: String = ""
+      var age: Int = 0
+      
+      init (name: String, age: Int) {
+        self.name = name
+        self.age = age
+      }
+      
+      func sayHi() -> String {
+        return "Hi \(name)"
+      }
+    }
+    
+And now let's create a subclass that adds one property and overrides the `sayHi` function:
+
+    class SpecialUser : User {
+      var greetingMessage: String
+      
+      func sayHi() -> String {
+        return "\(greetingMessage) \(name)"
+      }
+    }
+
+The syntax for inheritance is the same as for conforming to a protocol, add the type after a colon behind the class name. With this approach you will trigger two compiler errors: *Class 'SpecialUser' has no initializers* and *Overriding delcaration requires an 'override' keyword*. 
+
+Let's tackle them one by one. The first error occurs because `greetingMessage` is not initialized by any initializer and doesn't have a default value. We can either add an initializer or assign a default value to `greetingMessage`. 
+
+The second error occurs because Swift explicitly requires us to use the `override` keyword whenever we override an implementation of a superclass.
+
+Here's how we can mute the compiler:
+
+    class SpecialUser : User {
+      var greetingMessage: String
+      
+      init(name: String, age: Int, greetingMessage: String) {
+        self.greetingMessage = greetingMessage
+        super.init(name: name, age: age)
+      }
+      
+      override func sayHi() -> String {
+        return "\(greetingMessage) \(name)"
+      }
+    }
+
+We add an initializer that takes a `greetingMessage`. Additionally we add parameters for `name` and `age`. Swift requires us to call the initializer of the superclass, so we need to provide useful values for `name` and `age` as well.
+
+One significant difference to Objective-C is that **Swift subclasses don't inherit their superclass initializers when a custom initializer is provided**.  This means the only way to instantiate a `SpecialUser` is calling the `init(name:, age:, greetingMessage:)` initializer. This is a great improvement compared to Objective-C. If all initializers were inherited we could instantiate a `SpecialUser` with `init(name:, age:)` which would leave the `greetingMessage` uninitialized.
+
+The last aspect of initializer inheritance that we will discuss is the difference between `required`, `convenience` and designated initializers.
 
 ##Classes in Swift: Multiple References
 
