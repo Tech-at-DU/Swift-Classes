@@ -1,5 +1,5 @@
 ---
-title: "Learn Swift by example - Part 2: Enums"
+title: "Learn Swift by example - Part 3: Classes and Initialization"
 slug: classes-in-swift
 ---     
 
@@ -7,7 +7,7 @@ In [part 1](https://www.makeschool.com/tutorials/learn-swift-by-example-part-1-s
 
 But don't worry, classes still have their place in Swift. Unlike value types, classes support inheritance, muliple ownership and deinitializers. When writing Swift code for iOS we often need to subclass Apple's UIKit classes, so dealing with classes remains important.
 
-Today we will discuss classes in detail. We will start with basic class definitions, then we'll look into subclassing and initialization. 
+Today we will discuss classes in detail. We will start with basic class definitions, then we'll look into subclassing and the many details of initialization in Swift. 
 
 ##Basics
 
@@ -81,7 +81,7 @@ You will see this compiler error: *Cannot assign to 'let' value 'user1'*:
 
 It's important to keep the different semantics for `let` in mind when dealing with classes and structs in Swift.
 
-##Inheritance
+##Inheritance & Initializers
 Class inheritance in Swift works mostly as in Objective-C and other popular languages. There are two interesting aspects which I want to discuss in more detail: initializor inheritance and overriding.
 
 Let's add a method to our `User` class so that we can demonstrate method overriding:
@@ -131,29 +131,110 @@ Here's how we can mute the compiler:
       }
     }
 
-We add an initializer that takes a `greetingMessage`. Additionally we add parameters for `name` and `age`. Swift requires us to call the initializer of the superclass, so we need to provide useful values for `name` and `age` as well.
+We add an initializer that takes a `greetingMessage`. Additionally we add parameters for `name` and `age`. Swift requires us to call the initializer of the superclass, so we need to provide useful values for `name` and `age` as well. An interesting detail is that the call to the `super` initializer is the last statement. In Swift a subclass needs to set up all of its properties before calling the `super` initializer.
 
-One significant difference to Objective-C is that **Swift subclasses don't inherit their superclass initializers when a custom initializer is provided**.  This means the only way to instantiate a `SpecialUser` is calling the `init(name:, age:, greetingMessage:)` initializer. This is a great improvement compared to Objective-C. If all initializers were inherited we could instantiate a `SpecialUser` with `init(name:, age:)` which would leave the `greetingMessage` uninitialized.
+One significant difference to Objective-C is that **Swift subclasses don't inherit their superclass initializers when a custom (designated) initializer is provided**. You will learn about designated initializers later in this article. This means the only way to instantiate a `SpecialUser` is calling the `init(name:, age:, greetingMessage:)` initializer. This is a great improvement compared to Objective-C. If all initializers were inherited we could instantiate a `SpecialUser` with `init(name:, age:)` which would leave the `greetingMessage` uninitialized.
 
 The last aspect of initializer inheritance that we will discuss is the difference between `required`, `convenience` and designated initializers.
 
-##Classes in Swift: Multiple References
+Because I want to keep the code used in this article short the use cases for these different types of initializers will be somewhat fictional, but they should do a good job at explaining the concepts.
 
-##Classes in Swift: Deinitialization
+###Required initializers
 
+Using the `required` keyword you can force subclasses to implement an initializer of their superclass:
+
+    class User {
+      var name: String = ""
+      var age: Int = 0
+      
+      required init (name: String, age: Int) {
+        self.name = name
+        self.age = age
+      }
+      
+      func sayHi() -> String {
+        return "Hi \(name)"
+      }
+    }
+    
+Now you will receive a compiler error in the `SpecialUser` class, because you aren't implementing the required initializer. You can mute the error by adding the initializer to the `SpecialUser` class:
+
+    class SpecialUser : User {
+      var greetingMessage: String
+      
+      init(name: String, age: Int, greetingMessage: String) {
+        self.greetingMessage = greetingMessage
+        super.init(name: name, age: age)
+      }
+      
+      required init (name: String, age: Int) {
+        self.greetingMessage = ""
+        super.init(name: name, age: age)
+      }
+      
+      override func sayHi() -> String {
+        return "\(greetingMessage) \(name)"
+      }
+    }
+    
+Note that you need to use the `require` keyword again to enforce that any subclass down the inheritance hierarchy implements this initializer. If you want subclasses to provide initializers that are consistent with their superclasses, use the `require` keyword.
+
+###Convenience initializers
+
+Convenience initializers are not required to instantiate all properties of a class, instead they are allowed to rely on other initializers. In Swift only convenience initializers are allowed to delegate initialization to other initializers. Let's use a practical example to explore this:
+
+    class SpecialUser : User {
+      var greetingMessage: String
+      
+      init(name: String, age: Int, greetingMessage: String) {
+        self.greetingMessage = greetingMessage
+        super.init(name: name, age: age)
+      }
+      
+      required init (name: String, age: Int) {
+        self.greetingMessage = ""
+        super.init(name: name, age: age)
+      }
+      
+      convenience init(name:String) {
+        self.init(name: name, age: 0)
+      }
+      
+      convenience init() {
+        self.init(name: "Default")
+      }
+      
+      override func sayHi() -> String {
+        return "\(greetingMessage) \(name)"
+      }
+    }
+
+In this example we use convenience initializers to allow the `SpecialUser` to be initialized with a subset of the required parameters. We do this by using *constructor chaining*. The `init()` constructor provides a default name and calls the `init(name:)` constructor. That constructor in turn provides a default age and calls the **designated** initializer `init(name:, age:)`.
+
+Use `convenience` to provide convenient options for initializing your class. Note that it's unfortunately not possible to call `convenience` initializers of a superclass, in my oppinion that's a shortcoming in Swift.
+
+###Designated initializers
+
+All Swift initializers are designated initializers by default. Designated initializers are required to fully initialize an instance by assigning values to all non-optional properties. If a class isn't a root class, the designated initializer is also responsible for calling a designated initializer of the superclass. 
+
+All initializers that don't have the `convenience` keyword are designated initializers. 
+
+##Multiple ownership
+
+As mentioned of the beginning of this article, one of the special features of classes is that they support multiple ownership. They can be referenced by multiple variables and properties at the same time. This is not true for value types, they get copied upon every assignment.
+
+When is this feature useful? Two very practical examples are signing up for notifications or being the delegate for another class.  
+
+If you for example want to create a class `UserDataSource` that implements the  `UITableViewDataSource` protocol and becomes the delegate of a `UITableView` you need to pass a *reference* to a `UserDataSource` instance to the `UITableView`. Passing a reference is only possible using classes. So in such cases, where you need multiple parts of your code to work on the same instance you'll need to resort to classes.
+
+##Deinitialization
+
+Let's discuss the last feature that classes provide: *deinitialization*. 
 
 ##Conclusion
 
-Enums are very powerful in Swift! We can associate values with enum members and use them to model functions with multiple return results. As shown in the bank account example, this can be very useful for error handling. 
-
-We can also use enums to build state machines. Enums are guaranteed to only store one of their possible values at any point in time, this guarantee can be used to write more predictable code.
-
-The possibilities don't end here, I'm very excited to see how enums will be used to write better Swift code.
+Classes are more complex than structs and enums because they provide additional features such as subclassing and multiple ownership. In some cases these features can are necessary, for example when implementing the delegate pattern or registering for notifications. In other cases we are forced to use classes because we need to subclass from common UIKit classes. Classes are an essential part of every iOS app and I hope this article provided a good introduction to some details about their behaviour in Swift.
 
 If you want to learn more about Swift and ship your own original iPhone App or iPhone Game you should attend our [Summer Academy](https://makeschool.com/apply?referrer=54750)!
 
 Stay tuned for more tutorials in this series!
-
-##Related Resources
-
-- A great talk by [Austin Zheng](https://twitter.com/austinzheng) about [enums and pattern matching in Swift](http://realm.io/news/swift-enums-pattern-matching-generics/)
