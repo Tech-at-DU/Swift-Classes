@@ -5,9 +5,9 @@ slug: classes-in-swift
 
 In [part 1](https://www.makeschool.com/tutorials/learn-swift-by-example-part-1-structs/structs-in-swift) and [part 2](https://www.makeschool.com/tutorials/learn-swift-by-example-part-2-enums) of this tutorial series we have discussed how the value types *enum* and *struct* can be used in Swift. We have learned that these value types provide almost the same functionality as classes. 
 
-But don't worry, classes still have their place in Swift. Unlike value types, classes support inheritance, muliple ownership and deinitializers. When writing Swift code for iOS we often need to subclass Apple's UIKit classes, so dealing with classes remains important.
+But don't worry, classes still have their place in Swift. Unlike value types, classes support inheritance, multiple ownership and deinitializers. When writing Swift code for iOS we often need to subclass Apple's UIKit classes, so dealing with classes remains important.
 
-Today we will discuss classes in detail. We will start with basic class definitions, then we'll look into subclassing and the many details of initialization in Swift. 
+Today we will discuss classes in detail. We will start with basic class definitions, then we'll look into subclassing and the many details of initialization in Swift.
 
 ##Basics
 
@@ -18,11 +18,11 @@ Class definitions are way simpler than they used to be in Objective-C. We no lon
       var age: Int
     }
     
-With this class in place the Swift compiler will ommit an error message: *Class 'User' has no initializers*.
+With this class in place the Swift compiler will omit an error message: *Class 'User' has no initializers*.
 
 ![](no_init_error.png)
 
-This is one of the first differences between structs and classes. Structs provide a memberwise initializer by default. **Classes in Swift don't have default initializers (by default)**. Swift takes initialization security very seriously and doesn't allow non-optional properties to be uninitialized when an instance of our class is created. This means we will need to provide an initializer that sets all of our properties to non-nil values. 
+This is one of the first differences between structs and classes. Structs provide a memberwise initializer by default. **Classes in Swift don't have default initializers (by default)**. Swift takes initialization security very seriously and doesn't allow non-optional properties to be uninitialized when an instance of our class is created. This means we will need to provide an initializer that sets both of our properties to non-nil values. 
 
 One way of solving this problem is to make the default initializer available by setting default values for all of our properties:
 
@@ -47,7 +47,9 @@ The new user will have an empty name and an age of *0*. In many cases this defau
       }
     }
 
-If you are familiar if Objective-C you should be delighted by how simple initializers in Swift are. Since `User` is a root class (it is not subclassing from any other class) we don't need to call a `super` initializer. All we're doing is taking the two parameters and assigning them to our properties. Now that we have provided a custom initializer you will realize that our default initializer is no longer available.
+If you are familiar if Objective-C you should be delighted by how simple initializers in Swift are. Since `User` is a root class (it is not subclassing from any other class) we don't need to call a `super` initializer. All we're doing is taking the two parameters and assigning them to our properties. 
+
+Now that we have provided a custom initializer you will realize that our default initializer is no longer available.
 
 You should see the following compiler error: *Missing argument for parameter 'name' in call*.
 ![](missing_parameter.png)
@@ -56,9 +58,9 @@ Swift only provides the default initializer when we don't implement a custom one
 
     let user1 = User(name: "User", age: 99)
     
-We have defined and initialized a basic class. Next, let's take a look at how classes deal with mutablity.
+We have defined and initialized a basic class. Next, let's take a look at how classes deal with mutability.
     
-##Mutablity
+##Mutability
 
 As mentioned throughout the first two parts of this tutorial series, one of the important differences between value types and reference types is how they work in combination with `let` and `var`. 
 
@@ -69,7 +71,7 @@ Let's take a look at this in practice:
     let user1 = User(name: "User", age: 99)
     user1.age = 20
     
-You can create a user, assign the instance to a `let` variable and later change properties of that user. This wouldn't be possible if the user was declared as a `struct`. You cannot however, assign a new value to this variable:
+You can create a user, assign the instance to a `let` variable and later change properties of that user. This wouldn't be possible if the user was declared as a `struct`. You cannot however assign a new object to this variable:
 
     let user1 = User(name: "User", age: 99)
     user1.age = 20
@@ -82,9 +84,9 @@ You will see this compiler error: *Cannot assign to 'let' value 'user1'*:
 It's important to keep the different semantics for `let` in mind when dealing with classes and structs in Swift.
 
 ##Inheritance & Initializers
-Class inheritance in Swift works mostly as in Objective-C and other popular languages. There are two interesting aspects which I want to discuss in more detail: initializor inheritance and overriding.
+Inheritance in Swift works mostly as in Objective-C and other popular languages. There are two interesting aspects which I want to discuss in more detail: initializer inheritance and overriding.
 
-Let's add a method to our `User` class so that we can demonstrate method overriding:
+Let's add a `sayHi` method to our `User` class so that we can demonstrate method overriding:
 
     class User {
       var name: String = ""
@@ -110,13 +112,13 @@ And now let's create a subclass that adds one property and overrides the `sayHi`
       }
     }
 
-The syntax for inheritance is the same as for conforming to a protocol, add the type after a colon behind the class name. With this approach you will trigger two compiler errors: *Class 'SpecialUser' has no initializers* and *Overriding delcaration requires an 'override' keyword*. 
+The syntax for inheritance is the same as for conforming to a protocol, add the type after a colon behind the class name. With this approach you will trigger two compiler errors: *Class 'SpecialUser' has no initializers* and *Overriding declaration requires an 'override' keyword*. 
 
 Let's tackle them one by one. The first error occurs because `greetingMessage` is not initialized by any initializer and doesn't have a default value. We can either add an initializer or assign a default value to `greetingMessage`. 
 
 The second error occurs because Swift explicitly requires us to use the `override` keyword whenever we override an implementation of a superclass.
 
-Here's how we can mute the compiler:
+Here's one way to mute the compiler:
 
     class SpecialUser : User {
       var greetingMessage: String
@@ -177,7 +179,7 @@ Now you will receive a compiler error in the `SpecialUser` class, because you ar
       }
     }
     
-Note that you need to use the `require` keyword again to enforce that any subclass down the inheritance hierarchy implements this initializer. If you want subclasses to provide initializers that are consistent with their superclasses, use the `require` keyword.
+Note that you need to use the `required` keyword again to enforce that any subclass down the inheritance hierarchy implements this initializer. If you want subclasses to provide initializers that are consistent with their superclasses, use the `require` keyword.
 
 ###Convenience initializers
 
@@ -211,7 +213,7 @@ Convenience initializers are not required to instantiate all properties of a cla
 
 In this example we use convenience initializers to allow the `SpecialUser` to be initialized with a subset of the required parameters. We do this by using *constructor chaining*. The `init()` constructor provides a default name and calls the `init(name:)` constructor. That constructor in turn provides a default age and calls the **designated** initializer `init(name:, age:)`.
 
-Use `convenience` to provide convenient options for initializing your class. Note that it's unfortunately not possible to call `convenience` initializers of a superclass, in my oppinion that's a shortcoming in Swift.
+Use `convenience` to provide convenient options for initializing your class. Note that it's unfortunately not possible to call `convenience` initializers of a superclass, in my opinion that's a shortcoming of Swift.
 
 ###Designated initializers
 
@@ -221,19 +223,39 @@ All initializers that don't have the `convenience` keyword are designated initia
 
 ##Multiple ownership
 
-As mentioned of the beginning of this article, one of the special features of classes is that they support multiple ownership. They can be referenced by multiple variables and properties at the same time. This is not true for value types, they get copied upon every assignment.
+As mentioned at the beginning of this article one of the special features of classes is that they support multiple ownership. They can be referenced by multiple variables and properties at the same time. This is not true for value types, they get copied upon every assignment.
 
 When is this feature useful? Two very practical examples are signing up for notifications or being the delegate for another class.  
 
-If you for example want to create a class `UserDataSource` that implements the  `UITableViewDataSource` protocol and becomes the delegate of a `UITableView` you need to pass a *reference* to a `UserDataSource` instance to the `UITableView`. Passing a reference is only possible using classes. So in such cases, where you need multiple parts of your code to work on the same instance you'll need to resort to classes.
+If you for example want to create a class `UserDataSource` that implements the  `UITableViewDataSource` protocol and becomes the delegate of a `UITableView` you need to pass a *reference* to a `UserDataSource` instance to the `UITableView`. Passing a reference is only possible using classes. So in such cases, where you need multiple parts of your code to work on the same instance, you'll need to resort to classes.
 
 ##Deinitialization
 
-Let's discuss the last feature that classes provide: *deinitialization*. 
+Luckily memory management in Swift works vastly automatically. Use cases for deinitialization are rare. A typical one for iOS development is unsubscribing from notifications. In Swift the deinitializer is called directly before the instance is destroyed. Here's an example from a class that subscribes to keyboard notifications and unsubscribes as part of the deinitializer:
+
+      required init() {
+        NSNotificationCenter.defaultCenter().addObserver(self,
+          selector: "keyboardWillBeShown:",
+          name: "UIKeyboardWillShowNotification",
+          object: nil
+        )
+        
+        NSNotificationCenter.defaultCenter().addObserver(self,
+          selector: "keyboardWillBeHidden:",
+          name: "UIKeyboardWillHideNotification",
+          object: nil
+        )
+      }
+      
+      deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+      }
+      
+You won't need deinitializers frequently, but in some cases, as shown above, they are essential.
 
 ##Conclusion
 
-Classes are more complex than structs and enums because they provide additional features such as subclassing and multiple ownership. In some cases these features can are necessary, for example when implementing the delegate pattern or registering for notifications. In other cases we are forced to use classes because we need to subclass from common UIKit classes. Classes are an essential part of every iOS app and I hope this article provided a good introduction to some details about their behaviour in Swift.
+Classes are more complex than structs and enums because they provide additional features such as subclassing and multiple ownership. In some cases these features are necessary, for example when implementing the delegate pattern or registering for notifications. In other cases we are forced to use classes because we need to subclass from common UIKit classes. Classes are an essential part of every iOS app and I hope this article provided a good introduction to some details about their behavior in Swift.
 
 If you want to learn more about Swift and ship your own original iPhone App or iPhone Game you should attend our [Summer Academy](https://makeschool.com/apply?referrer=54750)!
 
