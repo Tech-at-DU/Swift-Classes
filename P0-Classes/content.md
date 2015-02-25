@@ -47,7 +47,7 @@ The new user will have an empty name and an age of *0*. In many cases this defau
       }
     }
 
-If you are familiar if Objective-C you should be delighted by how simple initializers in Swift are. Since `User` is a root class (it is not subclassing from any other class) we don't need to call a `super` initializer. All we're doing is taking the two parameters and assigning them to our properties. 
+If you are familiar with Objective-C you should be delighted by how simple initializers in Swift are. Since `User` is a root class (it is not subclassing from any other class) we don't need to call a `super` initializer. All we're doing is taking the two parameters and assigning them to our properties. 
 
 Now that we have provided a custom initializer you will realize that our default initializer is no longer available.
 
@@ -84,7 +84,7 @@ You will see this compiler error: *Cannot assign to 'let' value 'user1'*:
 It's important to keep the different semantics for `let` in mind when dealing with classes and structs in Swift.
 
 ##Inheritance & Initializers
-Inheritance in Swift works mostly as in Objective-C and other popular languages. There are two interesting aspects which I want to discuss in more detail: initializer inheritance and overriding.
+Inheritance in Swift works similarly to Objective-C and other popular languages. There are two interesting aspects which I want to discuss in more detail: initializer inheritance and overriding.
 
 Let's add a `sayHi` method to our `User` class so that we can demonstrate method overriding:
 
@@ -219,7 +219,7 @@ Use `convenience` to provide convenient options for initializing your class. Not
 
 All Swift initializers are designated initializers by default. Designated initializers are required to fully initialize an instance by assigning values to all non-optional properties. If a class isn't a root class, the designated initializer is also responsible for calling a designated initializer of the superclass. 
 
-All initializers that don't have the `convenience` keyword are designated initializers. 
+All initializers that don't have the `convenience` keyword are designated initializers. Required initializers are just a special form of designated initializer that need to be implemented by every subclass.
 
 ##Multiple ownership
 
