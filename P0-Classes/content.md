@@ -20,7 +20,7 @@ Class definitions are way simpler than they used to be in Objective-C. We no lon
     
 With this class in place the Swift compiler will omit an error message: *Class 'User' has no initializers*.
 
-![](no_init_error.png)
+![Class 'User' has no initializers](no_init_error.png)
 
 This is one of the first differences between structs and classes. Structs provide a memberwise initializer by default. **Classes in Swift don't have default initializers (by default)**. Swift takes initialization security very seriously and doesn't allow non-optional properties to be uninitialized when an instance of our class is created. This means we will need to provide an initializer that sets both of our properties to non-nil values. 
 
@@ -52,7 +52,7 @@ If you are familiar with Objective-C you should be delighted by how simple initi
 Now that we have provided a custom initializer you will realize that our default initializer is no longer available.
 
 You should see the following compiler error: *Missing argument for parameter 'name' in call*.
-![](missing_parameter.png)
+![Missing argument for parameter 'name' in call](missing_parameter.png)
 
 Swift only provides the default initializer when we don't implement a custom one. You are now required to initialize the user with a name and age:
 
@@ -79,7 +79,7 @@ You can create a user, assign the instance to a `let` variable and later change 
     user1 = User(name: "User2", age: 10)
     
 You will see this compiler error: *Cannot assign to 'let' value 'user1'*:
-![](cannot_assign_let.png)
+![Cannot assign to 'let' value 'user1'](cannot_assign_let.png)
 
 It's important to keep the different semantics for `let` in mind when dealing with classes and structs in Swift.
 
