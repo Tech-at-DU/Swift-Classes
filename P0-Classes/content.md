@@ -64,14 +64,14 @@ We have defined and initialized a basic class. Next, let's take a look at how cl
 
 As mentioned throughout the first two parts of this tutorial series, one of the important differences between value types and reference types is how they work in combination with `let` and `var`. 
 
-When you use the `let` keyword to declare an immutable variable of a reference type (a class) then only the reference itself becomes immutable. This means that the variable will not be able to reference a different object, but it is possible to change values of the object that's currently referenced.
+When you use the `let` keyword to declare a constant of a reference type (a class) then only the reference itself becomes immutable. This means that the constant will not be able to reference a different object, but it is possible to change values of the object that's currently referenced.
 
 Let's take a look at this in practice:
     
     let user1 = User(name: "User", age: 99)
     user1.age = 20
     
-You can create a user, assign the instance to a `let` variable and later change properties of that user. This wouldn't be possible if the user was declared as a `struct`. You cannot however assign a new object to this variable:
+You can create a user, assign the instance to a `let` constant and later change properties of that user. This wouldn't be possible if the user was declared as a `struct`. You cannot however assign a new object to this constant:
 
     let user1 = User(name: "User", age: 99)
     user1.age = 20
