@@ -179,7 +179,7 @@ Now you will receive a compiler error in the `SpecialUser` class, because you ar
       }
     }
     
-Note that you need to use the `required` keyword again to enforce that any subclass down the inheritance hierarchy implements this initializer. If you want subclasses to provide initializers that are consistent with their superclasses, use the `require` keyword.
+Note that you need to use the `required` keyword again to enforce that any subclass down the inheritance hierarchy implements this initializer. If you want subclasses to provide initializers that are consistent with their superclasses, use the `required` keyword.
 
 ###Convenience initializers
 
