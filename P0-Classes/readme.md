@@ -1,7 +1,4 @@
----
-title: "Learn Swift by example - Part 3: Classes and Initialization"
-slug: classes-in-swift
----     
+# Learn Swift by example - Part 3: Classes and Initialization 
 
 In [part 1](https://www.makeschool.com/tutorials/learn-swift-by-example-part-1-structs/structs-in-swift) and [part 2](https://www.makeschool.com/tutorials/learn-swift-by-example-part-2-enums) of this tutorial series we have discussed how the value types *enum* and *struct* can be used in Swift. We have learned that these value types provide almost the same functionality as classes. 
 
@@ -9,7 +6,7 @@ But don't worry, classes still have their place in Swift. Unlike value types, cl
 
 Today we will discuss classes in detail. We will start with basic class definitions, then we'll look into subclassing and the many details of initialization in Swift.
 
-##Basics
+## Basics
 
 Class definitions are way simpler than they used to be in Objective-C. We no longer have separate header and implementation files. Let's start by defining a simple `User` class in playground:
 
@@ -60,7 +57,7 @@ Swift only provides the default initializer when we don't implement a custom one
     
 We have defined and initialized a basic class. Next, let's take a look at how classes deal with mutability.
     
-##Mutability
+## Mutability
 
 As mentioned throughout the first two parts of this tutorial series, one of the important differences between value types and reference types is how they work in combination with `let` and `var`. 
 
@@ -141,7 +138,7 @@ The last aspect of initializer inheritance that we will discuss is the differenc
 
 Because I want to keep the code used in this article short the use cases for these different types of initializers will be somewhat fictional, but they should do a good job at explaining the concepts.
 
-###Required initializers
+### Required initializers
 
 Using the `required` keyword you can force subclasses to implement an initializer of their superclass:
 
@@ -181,7 +178,7 @@ Now you will receive a compiler error in the `SpecialUser` class, because you ar
     
 Note that you need to use the `required` keyword again to enforce that any subclass down the inheritance hierarchy implements this initializer. If you want subclasses to provide initializers that are consistent with their superclasses, use the `required` keyword.
 
-###Convenience initializers
+### Convenience initializers
 
 Convenience initializers are not required to instantiate all properties of a class, instead they are allowed to rely on other initializers. In Swift only convenience initializers are allowed to delegate initialization to other initializers. Let's use a practical example to explore this:
 
@@ -215,13 +212,13 @@ In this example we use convenience initializers to allow the `SpecialUser` to be
 
 Use `convenience` to provide convenient options for initializing your class. Note that it's unfortunately not possible to call `convenience` initializers of a superclass, in my opinion that's a shortcoming of Swift.
 
-###Designated initializers
+### Designated initializers
 
 All Swift initializers are designated initializers by default. Designated initializers are required to fully initialize an instance by assigning values to all non-optional properties. If a class isn't a root class, the designated initializer is also responsible for calling a designated initializer of the superclass. 
 
 All initializers that don't have the `convenience` keyword are designated initializers. Required initializers are just a special form of designated initializer that need to be implemented by every subclass.
 
-##Multiple ownership
+## Multiple ownership
 
 As mentioned at the beginning of this article one of the special features of classes is that they support multiple ownership. They can be referenced by multiple variables and properties at the same time. This is not true for value types, they get copied upon every assignment.
 
@@ -229,7 +226,7 @@ When is this feature useful? Two very practical examples are signing up for noti
 
 If you for example want to create a class `UserDataSource` that implements the  `UITableViewDataSource` protocol and becomes the delegate of a `UITableView` you need to pass a *reference* to a `UserDataSource` instance to the `UITableView`. Passing a reference is only possible using classes. So in such cases, where you need multiple parts of your code to work on the same instance, you'll need to resort to classes.
 
-##Deinitialization
+## Deinitialization
 
 Luckily memory management in Swift works vastly automatically. Use cases for deinitialization are rare. A typical one for iOS development is unsubscribing from notifications. In Swift the deinitializer is called directly before the instance is destroyed. Here's an example from a class that subscribes to keyboard notifications and unsubscribes as part of the deinitializer:
 
@@ -253,7 +250,7 @@ Luckily memory management in Swift works vastly automatically. Use cases for dei
       
 You won't need deinitializers frequently, but in some cases, as shown above, they are essential.
 
-##Conclusion
+## Conclusion
 
 Classes are more complex than structs and enums because they provide additional features such as subclassing and multiple ownership. In some cases these features are necessary, for example when implementing the delegate pattern or registering for notifications. In other cases we are forced to use classes because we need to subclass from common UIKit classes. Classes are an essential part of every iOS app and I hope this article provided a good introduction to some details about their behavior in Swift.
 
